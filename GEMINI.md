@@ -1,29 +1,51 @@
-# 🏛️ SHawn Lab: Bio-Project System Protocols (BIO-v3.5)
+# SHawn Lab: Bio-Project System Protocols (BIO-v3.6)
 
-## 1. 🆔 Identity & Persona
+## 1. Identity & Persona
 - **Domain:** Bio-Science Research & Data Intelligence
 - **Protocol:** **What-Why-How** (Strict Structure)
 - **Engine:** **SBI (SHawn Bio-Intelligence)**
 
-## 2. 📂 Directory Standards (Specialized)
-프로젝트 전문화를 위해 다음 폴더 체계를 엄격히 유지합니다.
+## 2. Directory Standards
 
 | Folder | Description | Key Contents |
 | :--- | :--- | :--- |
 | **`01-Analysis/`** | Core Data Analysis | `sbi_pipeline.py`, `research_engine.py` |
-| **`02-Literature/`** | Research Papers | Reference PDFs, Lit-Review MDs |
-| **`03-Vault/`** | Research Idea Vault | Hypotheses, Strategy Logs |
-| **`04-Assets/`** | Visual Indicators | Charts, Generated Bio-Images |
-| **`99-System/`** | Brain Architecture | Symlinks to `SHawn-BOT` engines |
+| **`99-System/`** | Brain Architecture | Integration layer to `SHawn-BOT` |
+| **`analysis/`** | Analysis Results | Generated reports, outputs |
+| **`assets/`** | Visual Indicators | Charts, Generated Bio-Images |
+| **`concepts/`** | Research Ideas | Hypotheses, Strategy Logs |
+| **`papers/`** | Literature | Reference PDFs, Papers |
+| **`knowledge_base/`** | Vector Index | FAISS index (gitignored) |
 
-## 3. ⚙️ SBI Knowledge Engineering
-- **Indexing**: OneDrive 루트(`/OneDrive-개인`)를 감시하여 저부하 배치 인덱싱 수행.
-- **Vector Store**: `FAISS` 엔진을 사용하여 고속 검색 및 멀티 모달 대응 준비.
-- **Inference**: `SHawnBrainV4`의 토론(Debate) 전용 태스크 타입을 사용하여 논리적 완성도 극대화.
+## 3. SBI Knowledge Engineering
 
-## 4. 🛡️ Security & Storage
-- 대용량 데이터(`data/`, `knowledge_base/`) 및 `venv`는 절대 Git에 커밋하지 않습니다.
-- 중복되는 코어 엔진은 `99-System/engines` 심볼릭 링크를 통해 `SHawn-BOT`과 동기화 상태를 유지합니다.
+### Indexing
+- 환경 변수 `ONEDRIVE_PATH` 또는 `.env` 파일로 OneDrive 경로 설정
+- 저부하 배치 인덱싱 (10 files/batch, 3s cooldown)
+
+### Vector Store
+- `FAISS` 엔진 사용 (`faiss-cpu`)
+- `all-MiniLM-L6-v2` 임베딩 모델
+
+### Inference
+- `SHawnBrainV4` 또는 `SHawnBrain` 자동 감지
+- Graceful degradation 지원 (모듈 미설치 시 로컬 문서만 검색)
+
+## 4. Environment Configuration
+
+```bash
+# Required
+export ONEDRIVE_PATH="/path/to/OneDrive"
+export PYTHONPATH="/path/to/SHawn-BOT:$PYTHONPATH"
+
+# Or use .env file
+ONEDRIVE_PATH=/path/to/OneDrive
+SHAWN_BOT_PATH=/path/to/SHawn-BOT
+```
+
+## 5. Security & Storage
+- 대용량 데이터(`knowledge_base/`) 및 `venv`는 Git에 커밋하지 않음
+- `.env` 파일은 `.gitignore`에 포함
 
 ---
 *SHawn Lab - Global Protocol 2026*
