@@ -1,1 +1,0 @@
-/Users/soohyunglee/Documents/GitHub/SHawn-BOT/shawn_brain_v2.py

@@ -4,15 +4,23 @@ ResearchEngine - SHawn-BIO 고도화 엔진
 """
 import os
 import asyncio
-from typing import List, Optional
+from typing import List, Optional, Tuple
 from loguru import logger
-from shawn_brain import SHawnBrain
+
+# SHawnBrain 의존성 - 외부 모듈 (SHawn-BOT)
+try:
+    from shawn_brain import SHawnBrain
+    BRAIN_AVAILABLE = True
+except ImportError:
+    BRAIN_AVAILABLE = False
+    logger.warning("SHawnBrain not available. Install SHawn-BOT or set PYTHONPATH.")
 
 class ResearchEngine:
     def __init__(self):
-        self.brain = SHawnBrain()
+        self.brain = SHawnBrain() if BRAIN_AVAILABLE else None
         curr_dir = os.path.dirname(os.path.abspath(__file__))
-        self.bio_root = os.path.join(curr_dir, "01-Bio-Research")
+        # 연구 문서 저장 경로 (papers, concepts, analysis 폴더 참조)
+        self.bio_root = curr_dir
 
     async def meta_analyze(self, topic: str) -> str:
         """관련된 모든 문서를 찾아 통합 분석 수행"""
@@ -52,7 +60,11 @@ class ResearchEngine:
 모든 결과는 한국어로 작성하며, 전문적이고 통찰력 있는 형식을 유지하세요.
 """
         
-        # UnifiedBrain.process 호출
+        # SHawnBrain.process 호출
+        if not self.brain:
+            logger.error("SHawnBrain not initialized. Cannot perform meta-analysis.")
+            return "⚠️ SHawnBrain 모듈이 설치되지 않았습니다. SHawn-BOT 프로젝트를 연결하세요."
+
         response, used_model, _ = await self.brain.process(prompt, domain="bio")
         return response
 
