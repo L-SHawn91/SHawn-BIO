@@ -4,6 +4,7 @@ ResearchEngine - SHawn-BIO 고도화 엔진
 """
 import os
 import asyncio
+<<<<<<< HEAD:01-Analysis/research_engine.py
 from typing import List, Optional
 import sys
 from loguru import logger
@@ -23,6 +24,25 @@ class ResearchEngine:
         self.brain = SHawnBrainV4(use_ensemble=False)
         self.pipeline = sbi_pipeline.SBIPipeline()
         self.bio_root = os.path.join(root_dir, "01-Bio-Research")
+=======
+from typing import List, Optional, Tuple
+from loguru import logger
+
+# SHawnBrain 의존성 - 외부 모듈 (SHawn-BOT)
+try:
+    from shawn_brain import SHawnBrain
+    BRAIN_AVAILABLE = True
+except ImportError:
+    BRAIN_AVAILABLE = False
+    logger.warning("SHawnBrain not available. Install SHawn-BOT or set PYTHONPATH.")
+
+class ResearchEngine:
+    def __init__(self):
+        self.brain = SHawnBrain() if BRAIN_AVAILABLE else None
+        curr_dir = os.path.dirname(os.path.abspath(__file__))
+        # 연구 문서 저장 경로 (papers, concepts, analysis 폴더 참조)
+        self.bio_root = curr_dir
+>>>>>>> 8bf44ac56bbc1a7a915153cc790187610edf90af:research_engine.py
 
     async def meta_analyze(self, topic: str) -> str:
         """관련된 모든 문서(Local md + OneDrive RAG)를 찾아 통합 토론 분석 수행"""
@@ -67,8 +87,17 @@ class ResearchEngine:
 모든 결과는 한국어로 작성하며, 전문적이고 통찰력 있는 형식을 유지하세요.
 """
         
+<<<<<<< HEAD:01-Analysis/research_engine.py
         # SHawnBrainV4.think 호출 (Debate 모드)
         response, info = await self.brain.think(prompt, task_type="debate")
+=======
+        # SHawnBrain.process 호출
+        if not self.brain:
+            logger.error("SHawnBrain not initialized. Cannot perform meta-analysis.")
+            return "⚠️ SHawnBrain 모듈이 설치되지 않았습니다. SHawn-BOT 프로젝트를 연결하세요."
+
+        response, used_model, _ = await self.brain.process(prompt, domain="bio")
+>>>>>>> 8bf44ac56bbc1a7a915153cc790187610edf90af:research_engine.py
         return response
 
 if __name__ == "__main__":
