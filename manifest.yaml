@@ -1,0 +1,28 @@
+# SHawn-BIO Cartridge Manifest
+name: bio
+version: "1.0.0"
+description: "Bio-Science Research & Data Intelligence Module"
+
+brain_map:
+  region: "시상하부 (Hypothalamus)"
+  function: "항상성 유지 및 연구 조절"
+  component: "SBI Pipeline (Cartridge)"
+  system_function: "바이오 데이터 분석 및 문헌 검색"
+  emoji: "🔬"
+
+# [Project OMNI] Dynamic Intelligence Mapping
+intents:
+  keywords: ["오가노이드", "organoid", "유전자", "protein", "dna", "cell", "바이오", "bio"]
+  search_required: true
+
+# Adapter Configuration
+adapter:
+  class: "BIOAdapter"
+  module: "engines.adapters.bio_adapter" # Temporary: keeping in core for now
+
+paths:
+  tools: "tools"
+  knowledge: "knowledge" # Updated from knowledge_base
+  protocols: "protocols"
+  analysis: "analysis"
+  data: "data"

@@ -13,8 +13,9 @@ venv/
 ENV/
 
 # --- [Core Intelligence Storage] ---
-# 지능형 지식 베이스 (ChromaDB 등) - 깃 용량 초과 방지
+# 지능형 지식 베이스 (ChromaDB, FAISS 등) - 깃 용량 초과 방지
 knowledge_base/
+knowledge/
 *.db
 *.sqlite3
 indices/
