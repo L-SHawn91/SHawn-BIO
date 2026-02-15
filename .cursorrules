@@ -1,0 +1,51 @@
+# 🤖 SHawn-BIO Cursor Rules
+
+> **Bio-Science Research & Analysis System**
+
+---
+
+## 🚀 UV 사용 규칙 (필수)
+
+### Python 패키지 관리
+- **모든 패키지 설치는 `uv`를 사용합니다**
+- ❌ `pip install` 사용 금지
+- ❌ `conda` 사용 금지
+
+### 필수 명령어
+```bash
+# 가상환경 생성
+uv venv
+
+# 패키지 설치
+uv pip install -r requirements.txt
+
+# 개발 모드
+uv pip install -e ".[dev]"
+```
+
+---
+
+## 🔬 생물정보학 패키지
+
+```toml
+dependencies = [
+    "biopython>=1.81",
+    "pandas>=2.0.0",
+    "numpy>=1.24.0",
+    "matplotlib>=3.7.0",
+    "seaborn>=0.12.0",
+    "scikit-learn>=1.3.0",
+]
+```
+
+---
+
+## 💻 코딩 규칙
+
+- **Formatter**: `black` (line-length: 100)
+- **Linter**: `ruff`
+- **Python**: 3.11+
+
+---
+
+*UV Rules Applied - 2026-02-09*
