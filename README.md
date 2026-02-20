@@ -33,8 +33,9 @@ OneDrive 연동 하이브리드 지식 엔진:
 ### 환경 설정
 
 ```bash
-# 1. 의존성 설치
-pip install -r requirements.txt
+# 1. uv 기반 가상환경 + 의존성 설치
+uv venv
+uv pip install -r requirements.txt
 
 # 2. OneDrive 경로 설정 (선택)
 export ONEDRIVE_PATH="/path/to/your/OneDrive"
@@ -54,10 +55,10 @@ export PYTHONPATH="/path/to/SHawn-BOT:$PYTHONPATH"
 
 ```bash
 # 1. 환경 검증
-python 01-Analysis/verify_brain.py
+uv run python 01-Analysis/verify_brain.py
 
 # 2. 통합 테스트 실행
-python 01-Analysis/test_sbi_research.py
+uv run python 01-Analysis/test_sbi_research.py
 ```
 
 ## Governance
