@@ -16,6 +16,7 @@ PROJECT OMNI: Context Morphing 완벽 지원
 
 import logging
 import json
+import re
 from pathlib import Path
 from typing import Dict, List, Any, Optional, Tuple
 from dataclasses import dataclass, asdict
@@ -113,10 +114,43 @@ class BioMemory:
         return {}
     
     def search_papers(self, query: str, limit: int = 10) -> List[Dict]:
-        """FAISS를 사용한 논문 검색 (sbi_pipeline.py)"""
+        """
+        논문 검색:
+        1) SBIPipeline semantic 검색
+        2) 실패 시 로컬 데이터 토큰 부분 일치 fallback
+        """
         logger.info(f"🧬 Searching papers: {query}")
-        # sbi_pipeline.py의 검색 로직을 호출
-        return self.research_data.get(query, [])[:limit]
+        try:
+            from tools.sbi_pipeline import SBIPipeline
+            pipeline = SBIPipeline(db_path=str(self.knowledge_dir))
+            hits = pipeline.search(query, n_results=limit)
+            if hits:
+                return hits
+        except Exception as e:
+            logger.warning(f"⚠️ SBIPipeline search fallback: {e}")
+
+        # Fallback: 기존 로컬 데이터(딕셔너리)에서 부분 매칭
+        normalized = re.sub(r"[^0-9a-z가-힣\s]", " ", query.lower())
+        tokens = [t for t in normalized.split() if len(t) >= 2]
+        if not tokens:
+            return []
+
+        fallback_hits = []
+        for key, value in self.research_data.items():
+            key_norm = re.sub(r"[^0-9a-z가-힣\s]", " ", str(key).lower())
+            score = sum(1 for t in tokens if t in key_norm)
+            if score <= 0:
+                continue
+            fallback_hits.append({
+                "source": str(key),
+                "content": str(value)[:1000],
+                "distance": 0.0,
+                "score": float(score / len(tokens)),
+                "token_hits": score,
+            })
+
+        fallback_hits.sort(key=lambda x: x["score"], reverse=True)
+        return fallback_hits[:limit]
     
     def add_research_result(self, domain: str, result: Dict):
         """연구 결과 추가"""

@@ -5,6 +5,7 @@ ResearchEngine - SHawn-BIO 고도화 엔진 (v3.6)
 import os
 import sys
 import asyncio
+import re
 from typing import List, Optional, Tuple
 from loguru import logger
 
@@ -13,26 +14,55 @@ curr_dir = os.path.dirname(os.path.abspath(__file__))
 root_dir = os.path.dirname(curr_dir)
 sys.path.append(os.path.join(root_dir, "99-System"))
 
-# SHawnBrain 의존성 - 유연한 임포트 지원
+def _inject_brain_paths():
+    """SHawn-BOT/Brain 후보 경로를 sys.path에 주입"""
+    workspace_parent = os.path.dirname(root_dir)
+    env_brain_path = os.environ.get("SHAWN_BOT_PATH")
+    candidates = [
+        env_brain_path,
+        os.path.join(root_dir, "99-System"),
+        os.path.join(workspace_parent, "SHawn-LAB", "SHawn-BOT"),
+        os.path.join(workspace_parent, "SHawn-Brain"),
+        os.path.join(workspace_parent, "SHawn-Lab-Vault", "99-System"),
+        os.path.join(workspace_parent, "SHawn-Lab-Vault", "99-System", "shawn_bot"),
+    ]
+    for base in candidates:
+        if not base:
+            continue
+        for path in [base, os.path.join(base, "99-System"), os.path.join(base, "shawn_bot")]:
+            if os.path.isdir(path) and path not in sys.path:
+                sys.path.insert(0, path)
+
+
+_inject_brain_paths()
+
+# SHawnBrain 의존성 - 다중 버전 유연 임포트
 BRAIN_AVAILABLE = False
 brain_class = None
+brain_name = None
+brain_load_errors = []
 
-# 환경에 따라 적절한 Brain 모듈 로드
-try:
-    # 1순위: SHawn-BOT의 최신 v4 아키텍처
-    from shawn_brain_v4 import SHawnBrainV4
-    brain_class = SHawnBrainV4
-    BRAIN_AVAILABLE = True
-    logger.info("✅ SHawnBrainV4 loaded successfully")
-except ImportError:
+for module_name, class_name in [
+    ("shawn_brain_v4", "SHawnBrainV4"),
+    ("shawn_brain", "SHawnBrain"),
+    ("shawn_brain_v2", "SHawnBrainV2"),
+    ("shawn_bot.shawn_brain_v2", "SHawnBrainV2"),
+]:
     try:
-        # 2순위: 기본 SHawnBrain
-        from shawn_brain import SHawnBrain
-        brain_class = SHawnBrain
+        module = __import__(module_name, fromlist=[class_name])
+        brain_class = getattr(module, class_name)
+        brain_name = class_name
         BRAIN_AVAILABLE = True
-        logger.info("✅ SHawnBrain loaded successfully")
-    except ImportError:
-        logger.warning("⚠️ SHawnBrain not available. Install SHawn-BOT or set PYTHONPATH.")
+        logger.info(f"✅ {brain_name} loaded successfully ({module_name})")
+        break
+    except Exception as e:
+        brain_load_errors.append(f"{module_name}.{class_name}: {e}")
+        continue
+
+if not BRAIN_AVAILABLE:
+    logger.warning("⚠️ SHawnBrain not available. Install SHawn-BOT/SHawn-Brain or set SHAWN_BOT_PATH.")
+    for err in brain_load_errors:
+        logger.warning(f"  - load failed: {err}")
 
 # 로컬 SBI Pipeline 임포트
 try:
@@ -51,7 +81,7 @@ class ResearchEngine:
         if BRAIN_AVAILABLE and brain_class:
             try:
                 # V4는 use_ensemble 파라미터 지원
-                if brain_class.__name__ == 'SHawnBrainV4':
+                if brain_name == 'SHawnBrainV4':
                     self.brain = brain_class(use_ensemble=False)
                 else:
                     self.brain = brain_class()
@@ -80,13 +110,18 @@ class ResearchEngine:
         logger.info(f"Starting {'Debate' if is_debate else 'Meta-Analysis'} for: {topic}")
         
         matched_content = []
+        topic_tokens = [t for t in re.sub(r"[^0-9a-z가-힣\s]", " ", topic.lower()).split() if len(t) >= 2]
 
         # 1. 문서 검색 (Vector DB - OneDrive)
         if self.pipeline:
             try:
-                rag_hits = self.pipeline.search(topic, n_results=5)
+                rag_hits = self.pipeline.search(topic, n_results=12)
                 for hit in rag_hits:
-                    matched_content.append(f"Source (OneDrive): {hit['source']}\nContent:\n{hit['content'][:1000]}")
+                    matched_content.append(
+                        f"Source (OneDrive): {hit['source']}\n"
+                        f"Score: {hit.get('score', 0):.4f}, Distance: {hit.get('distance', 0):.4f}\n"
+                        f"Content:\n{hit['content'][:1000]}"
+                    )
             except Exception as e:
                 logger.error(f"RAG Search failed: {e}")
 
@@ -103,7 +138,12 @@ class ResearchEngine:
                         try:
                             with open(path, 'r', encoding='utf-8') as f:
                                 content = f.read()
-                                if topic.lower() in content.lower():
+                                lowered = content.lower()
+                                direct_match = topic.lower() in lowered
+                                token_match_count = sum(1 for t in topic_tokens if t in lowered)
+                                partial_match = token_match_count >= 1 if topic_tokens else False
+
+                                if direct_match or partial_match:
                                     matched_content.append(f"Source ({sub}/{file}): {content[:1000]}...")
                                     if len(matched_content) >= 10: break
                         except Exception as e:

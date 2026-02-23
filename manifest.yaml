@@ -22,7 +22,9 @@ adapter:
 
 paths:
   tools: "tools"
-  knowledge: "knowledge" # Updated from knowledge_base
-  protocols: "protocols"
+  knowledge: "knowledge"
+  protocol: "GEMINI.md"
+  system: "99-System"
   analysis: "analysis"
   data: "data"
+  legacy: "legacy_imports"

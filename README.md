@@ -1,70 +1,78 @@
-# SHawn-BIO: Specialized Bio-Research Hub (v3.6)
+# SHawn-BIO
 
-> **SHawn Lab: High-Performance Bio-Science Research & Intelligence Division**
+SHawn-BIO는 바이오 리서치용 지식 검색(SBI)과 메타 분석(ResearchEngine)을 제공하는 Python 워크스페이스입니다.
 
-암 치료, 오가노이드 기술, 정밀 의료 등 첨단 바이오 사이언스 리서치 데이터와 AI 기반의 지능형 분석 파이프라인을 운영하는 전문 리서치 허브입니다.
+## 현재 구조 (실제 기준)
 
-## Directory Structure
-
-```
+```text
 SHawn-BIO/
-├── 01-Analysis/          # 핵심 분석 엔진 및 파이프라인
-│   ├── research_engine.py    # 메타 분석 엔진 (v3.5)
-│   ├── sbi_pipeline.py       # FAISS 벡터 검색 파이프라인
-│   ├── test_sbi_research.py  # 통합 테스트 스크립트
-│   └── verify_brain.py       # Brain 모듈 검증
-├── 99-System/            # SHawn-BOT 연동 레이어
-├── analysis/             # 분석 결과 저장소
-├── assets/               # 시각화 차트 및 이미지
-├── concepts/             # 연구 개념 및 가설 메모
-├── papers/               # 논문 및 문헌 자료
-├── knowledge_base/       # FAISS 벡터 인덱스 (gitignore)
-├── requirements.txt      # Python 의존성
-└── GEMINI.md            # 시스템 프로토콜
+├── tools/                     # 실행 핵심 모듈
+│   ├── sbi_pipeline.py        # OneDrive 문서 인덱싱 + FAISS 검색
+│   ├── research_engine.py     # RAG + Brain 연계 메타 분석
+│   ├── verify_brain.py        # 연동/환경 점검
+│   └── test_sbi_research.py   # 통합 테스트 스크립트
+├── bio_cartridge.py           # Bio cartridge 통합 인터페이스
+├── knowledge/                 # 벡터 인덱스/메타데이터 저장 위치(기본)
+├── analysis/                  # 분석 출력 저장소
+├── data/                      # 데이터 저장소
+├── 99-System/                 # SHawn-BOT 연동 레이어 문서
+├── legacy_imports/            # 과거 프로젝트 및 자동화 스크립트 보관
+├── manifest.yaml              # cartridge manifest
+├── GEMINI.md                  # 운영 프로토콜
+└── requirements.txt           # Python 의존성
 ```
 
-## SBI (SHawn Bio-Intelligence)
+자세한 폴더별 기능은 `PROJECT_MAP.md`를 참고하세요.
 
-OneDrive 연동 하이브리드 지식 엔진:
+## 핵심 컴포넌트
 
-- **Search**: `sbi_pipeline.py` - FAISS 기반 고속 벡터 검색
-- **Analyze**: `research_engine.py` - 메타 분석 및 가설 생성
+- `tools/sbi_pipeline.py`
+  - OneDrive의 PDF/TXT를 파싱해 벡터 인덱스를 생성
+  - 기본 DB 경로: `knowledge/`
+  - 구버전 `knowledge_base/`가 있으면 로드 호환
+- `tools/research_engine.py`
+  - SBI 검색 결과 + 로컬 문서를 결합해 메타 분석
+  - SHawnBrainV4/SHawnBrain이 있으면 연결, 없으면 graceful fallback
+- `bio_cartridge.py`
+  - Memory/Values/Skills/Tools 구조의 바이오 도메인 인터페이스
 
-### 환경 설정
+## 환경 설정
 
 ```bash
-# 1. uv 기반 가상환경 + 의존성 설치
+# 가상환경/의존성
 uv venv
 uv pip install -r requirements.txt
 
-# 2. OneDrive 경로 설정 (선택)
-export ONEDRIVE_PATH="/path/to/your/OneDrive"
+# 선택: OneDrive 경로 지정
+export ONEDRIVE_PATH="/path/to/OneDrive"
 
-# 또는 .env 파일 생성
-echo 'ONEDRIVE_PATH="/path/to/OneDrive"' > .env
-```
-
-### SHawn-BOT 연동
-
-```bash
-# PYTHONPATH로 SHawn-BOT 연결
+# 선택: SHawn-BOT 연동 경로
 export PYTHONPATH="/path/to/SHawn-BOT:$PYTHONPATH"
+
+# 권장: SHawn-BOT/Brain 루트 지정 (자동 탐지 보조)
+export SHAWN_BOT_PATH="/path/to/SHawn-BOT"
+
+# 선택: 지식 DB 경로 오버라이드
+export SBI_DB_PATH="/path/to/custom/knowledge"
 ```
 
-## Quick Start
+## 실행 가이드
 
 ```bash
-# 1. 환경 검증
-uv run python 01-Analysis/verify_brain.py
+# 1) 연동 상태 점검
+uv run python tools/verify_brain.py
 
-# 2. 통합 테스트 실행
-uv run python 01-Analysis/test_sbi_research.py
+# 2) 문서 인덱싱
+uv run python tools/sbi_pipeline.py
+
+# 3) 통합 테스트
+uv run python tools/test_sbi_research.py
+
+# 4) cartridge 단독 테스트
+uv run python bio_cartridge.py
 ```
 
-## Governance
+## 참고
 
-- 모든 연구 결과는 **What-Why-How** 삼단논법 준수
-- 상세 운영 규정은 `GEMINI.md` 참조
-
----
-*Powered by SHawn-Bot AI-Intelligence Network (v3.6)*
+- `legacy_imports/`는 현재 운영 코드가 아닌 과거 자산 보관용입니다.
+- CI는 `.github/workflows/ci-uv.yml`에서 `py_compile` 스모크 체크를 수행합니다.
