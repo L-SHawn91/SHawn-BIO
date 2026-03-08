@@ -1,0 +1,4 @@
+interface:
+  display_name: "SHawn-Bio-Search"
+  short_description: "Claim-level biomedical paper/dataset search with author disambiguation"
+  default_prompt: "Use $shawn-bio-search to run SHawn-WEB/SHawn-BIO integrated search, including author disambiguation profiles when needed."
