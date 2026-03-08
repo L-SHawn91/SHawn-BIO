@@ -3,16 +3,21 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "shawn-bio-nli"
-version = "0.1.0"
-description = "Natural language interface for SHawn-BIO search workflows"
+name = "shawn-bio"
+version = "0.2.0"
+description = "SHawn-BIO: Biomedical research tools with multi-source literature search"
 readme = "README.md"
 requires-python = ">=3.9"
-dependencies = []
+dependencies = [
+    "requests>=2.25.0",
+    "urllib3>=1.26.0",
+]
 
 [project.scripts]
 shawn-bio-nli = "tools.nli:main"
+shawn-bio-search = "shawn_bio_search.cli:main"
+sbs = "shawn_bio_search.cli:main"
 
 [tool.setuptools.packages.find]
 where = ["."]
-include = ["tools*"]
+include = ["tools*", "shawn_bio_search*"]

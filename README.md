@@ -1,8 +1,40 @@
-# SHawn-BIO: Specialized Bio-Research Hub (v3.6)
+# SHawn-BIO: Specialized Bio-Research Hub (v3.7)
 
 > **SHawn Lab: High-Performance Bio-Science Research & Intelligence Division**
 
 암 치료, 오가노이드 기술, 정밀 의료 등 첨단 바이오 사이언스 리서치 데이터와 AI 기반의 지능형 분석 파이프라인을 운영하는 전문 리서치 허브입니다.
+
+## 🆕 What's New (v3.7)
+
+### Shawn-Bio-Search: Multi-Source Literature Search
+
+9개 글로벌 학술 DB 통합 검색 with 근거 기반 스코어링:
+
+| Source | Type | API Key |
+|--------|------|---------|
+| PubMed | Primary | Optional |
+| Scopus | Citation | Required |
+| Google Scholar | Broad | Required |
+| Europe PMC | Open Access | Free |
+| OpenAlex | Open | Free |
+| Crossref | DOI | Free |
+| ClinicalTrials.gov | Trials | Free |
+| bioRxiv | Preprint | Free |
+| medRxiv | Preprint | Free |
+
+```bash
+# 설치 후 바로 사용
+shawn-bio-search -q "organoid stem cell"
+
+# 주장 검증
+shawn-bio-search -q "endometrial organoid" \
+  -c "ECM is essential for organoid formation"
+
+# JSON 출력
+shawn-bio-search -q "cancer immunotherapy" -f json
+```
+
+---
 
 ## Directory Structure
 
@@ -13,6 +45,11 @@ SHawn-BIO/
 │   ├── sbi_pipeline.py       # FAISS 벡터 검색 파이프라인
 │   ├── test_sbi_research.py  # 통합 테스트 스크립트
 │   └── verify_brain.py       # Brain 모듈 검증
+├── shawn_bio_search/     # 🆕 9-source literature search
+│   ├── search.py             # 핵심 검색 기능
+│   ├── cli.py                # 명령줄 인터페이스
+│   ├── scoring.py            # 근거 평가 알고리즘
+│   └── sources/              # 9개 소스 모듈
 ├── 99-System/            # SHawn-BOT 연동 레이어
 ├── analysis/             # 분석 결과 저장소
 ├── assets/               # 시각화 차트 및 이미지
