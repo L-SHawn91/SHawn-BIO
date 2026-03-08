@@ -24,5 +24,10 @@ jobs:
       - name: Install dependencies
         run: uv pip install -r requirements.txt
 
-      - name: Smoke check
-        run: uv run python -m py_compile bio_cartridge.py
+      - name: Compile check
+        run: uv run python -m py_compile bio_cartridge.py tools/*.py
+
+      - name: CLI smoke check
+        run: |
+          uv run python tools/nli.py --dry-run --json "endometrial organoid papers"
+          uv run python tools/shawn_bio_search_cli.py --help

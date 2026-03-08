@@ -31,6 +31,74 @@ def _low_info_claim(claim: str) -> bool:
     return x in {"검증", "검증해", "확인", "확인해", "verify", "check", "prove"}
 
 
+def _load_json_if_exists(path: str) -> Dict | None:
+    try:
+        p = Path(path)
+        if not p.exists():
+            return None
+        with p.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, dict):
+            return data
+    except Exception:
+        return None
+    return None
+
+
+def _paper_explanation(p: Dict) -> str:
+    evidence = float(p.get("evidence_score") or 0.0)
+    support = float(p.get("support_score") or 0.0)
+    contra = float(p.get("contradiction_score") or 0.0)
+    claim_ov = float(p.get("claim_overlap") or 0.0)
+    hyp_ov = float(p.get("hypothesis_overlap") or 0.0)
+    sent = str(p.get("best_support_sentence") or "").strip()
+    if sent:
+        sent = sent[:220]
+    if sent:
+        return (
+            f"evidence={evidence:.2f}, support={support:.2f}, contradiction={contra:.2f}, "
+            f"claim_overlap={claim_ov:.2f}, hypothesis_overlap={hyp_ov:.2f}; "
+            f"best_support_sentence: {sent}"
+        )
+    return (
+        f"evidence={evidence:.2f}, support={support:.2f}, contradiction={contra:.2f}, "
+        f"claim_overlap={claim_ov:.2f}, hypothesis_overlap={hyp_ov:.2f}"
+    )
+
+
+def _paper_refs_with_metadata(payload: Dict | None) -> List[Dict[str, str]]:
+    if not payload:
+        return []
+    papers = payload.get("papers")
+    if not isinstance(papers, list):
+        return []
+    refs: List[Dict[str, str]] = []
+    for p in papers:
+        if not isinstance(p, dict):
+            continue
+        title = str(p.get("title") or "").strip()
+        if not title:
+            continue
+        authors = p.get("authors")
+        if isinstance(authors, list):
+            author_text = ", ".join([str(a).strip() for a in authors if str(a).strip()]) or "N/A"
+        else:
+            author_text = "N/A"
+        year_val = p.get("year")
+        year_text = str(year_val) if isinstance(year_val, int) and year_val > 0 else "N/A"
+        doi = str(p.get("doi") or "").strip() or "N/A"
+        refs.append(
+            {
+                "authors": author_text,
+                "year": year_text,
+                "title": title,
+                "doi": doi,
+                "explanation": _paper_explanation(p),
+            }
+        )
+    return refs
+
+
 class BioSearchNLI:
     """Natural Language Interface for bio search."""
 
@@ -212,12 +280,17 @@ class BioSearchNLI:
             }
             timeout = timeout_map.get(parsed["intent"], 60)
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+            references: List[Dict[str, str]] = []
+            if parsed["intent"] == "search_papers":
+                out_payload = _load_json_if_exists("/tmp/shawn_bio_papers.json")
+                references = _paper_refs_with_metadata(out_payload)
             return {
                 "success": result.returncode == 0,
                 "command": " ".join(cmd),
                 "parsed": parsed,
                 "stdout": result.stdout,
                 "stderr": result.stderr,
+                "references": references,
             }
         except Exception as e:
             return {"success": False, "error": str(e), "parsed": parsed}
@@ -267,6 +340,17 @@ def main() -> int:
         print("성공!")
         if payload.get("stdout"):
             print(payload["stdout"][:500])
+        refs = payload.get("references") or []
+        if payload.get("parsed", {}).get("intent") == "search_papers":
+            print("\n📚 References (Authors / Year / Title / DOI / Explanation)")
+        if refs:
+            for i, ref in enumerate(refs, start=1):
+                print(f"{i}. {ref['authors']} ({ref['year']})")
+                print(f"   Title: {ref['title']}")
+                print(f"   DOI: {ref['doi']}")
+                print(f"   Explanation: {ref['explanation']}")
+        elif payload.get("parsed", {}).get("intent") == "search_papers":
+            print("- No references found.")
         return 0
     print(f"실패: {payload.get('error', 'Unknown error')}")
     if payload.get("stderr"):
