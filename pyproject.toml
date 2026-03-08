@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "shawn-bio-nli"
+version = "0.1.0"
+description = "Natural language interface for SHawn-BIO search workflows"
+readme = "README.md"
+requires-python = ">=3.9"
+dependencies = []
+
+[project.scripts]
+shawn-bio-nli = "tools.nli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["tools*"]

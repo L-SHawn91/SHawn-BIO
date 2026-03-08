@@ -61,6 +61,44 @@ uv run python 01-Analysis/verify_brain.py
 uv run python 01-Analysis/test_sbi_research.py
 ```
 
+## Natural Language CLI (Cross-Platform)
+
+`tools/nli.py`를 패키지 엔트리포인트로 노출했습니다.  
+GitHub에서 바로 설치 후, macOS/Linux/Windows 어디서든 동일 명령으로 실행할 수 있습니다.
+
+### 1) Install
+
+```bash
+pipx install "git+https://github.com/L-SHawn91/SHawn-BIO.git@main"
+```
+
+`pipx`가 없다면:
+
+- macOS/Linux: `python3 -m pip install --user pipx && python3 -m pipx ensurepath`
+- Windows (PowerShell): `py -m pip install --user pipx && py -m pipx ensurepath`
+
+### 2) Run
+
+```bash
+shawn-bio-nli "자궁내막 오가노이드 논문 찾아줘"
+shawn-bio-nli "find RNA-Seq datasets for endometrial organoid"
+shawn-bio-nli --dry-run --json "progesterone resistance 주장 검증해"
+```
+
+### 3) Skill Path Override (Optional)
+
+기본 스크립트 경로는 `~/.openclaw/workspace/skills/shawn-bio-search` 입니다.
+
+```bash
+shawn-bio-nli --skill-path "/custom/path/shawn-bio-search" "search query"
+```
+
+또는 환경변수:
+
+```bash
+export SHAWN_BIO_SKILL_PATH="/custom/path/shawn-bio-search"
+```
+
 ## Governance
 
 - 모든 연구 결과는 **What-Why-How** 삼단논법 준수
