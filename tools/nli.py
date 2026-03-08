@@ -45,7 +45,28 @@ def _load_json_if_exists(path: str) -> Dict | None:
     return None
 
 
-def _paper_refs_with_title_doi(payload: Dict | None) -> List[Dict[str, str]]:
+def _paper_explanation(p: Dict) -> str:
+    evidence = float(p.get("evidence_score") or 0.0)
+    support = float(p.get("support_score") or 0.0)
+    contra = float(p.get("contradiction_score") or 0.0)
+    claim_ov = float(p.get("claim_overlap") or 0.0)
+    hyp_ov = float(p.get("hypothesis_overlap") or 0.0)
+    sent = str(p.get("best_support_sentence") or "").strip()
+    if sent:
+        sent = sent[:220]
+    if sent:
+        return (
+            f"evidence={evidence:.2f}, support={support:.2f}, contradiction={contra:.2f}, "
+            f"claim_overlap={claim_ov:.2f}, hypothesis_overlap={hyp_ov:.2f}; "
+            f"best_support_sentence: {sent}"
+        )
+    return (
+        f"evidence={evidence:.2f}, support={support:.2f}, contradiction={contra:.2f}, "
+        f"claim_overlap={claim_ov:.2f}, hypothesis_overlap={hyp_ov:.2f}"
+    )
+
+
+def _paper_refs_with_metadata(payload: Dict | None) -> List[Dict[str, str]]:
     if not payload:
         return []
     papers = payload.get("papers")
@@ -58,8 +79,23 @@ def _paper_refs_with_title_doi(payload: Dict | None) -> List[Dict[str, str]]:
         title = str(p.get("title") or "").strip()
         if not title:
             continue
+        authors = p.get("authors")
+        if isinstance(authors, list):
+            author_text = ", ".join([str(a).strip() for a in authors if str(a).strip()]) or "N/A"
+        else:
+            author_text = "N/A"
+        year_val = p.get("year")
+        year_text = str(year_val) if isinstance(year_val, int) and year_val > 0 else "N/A"
         doi = str(p.get("doi") or "").strip() or "N/A"
-        refs.append({"title": title, "doi": doi})
+        refs.append(
+            {
+                "authors": author_text,
+                "year": year_text,
+                "title": title,
+                "doi": doi,
+                "explanation": _paper_explanation(p),
+            }
+        )
     return refs
 
 
@@ -247,7 +283,7 @@ class BioSearchNLI:
             references: List[Dict[str, str]] = []
             if parsed["intent"] == "search_papers":
                 out_payload = _load_json_if_exists("/tmp/shawn_bio_papers.json")
-                references = _paper_refs_with_title_doi(out_payload)
+                references = _paper_refs_with_metadata(out_payload)
             return {
                 "success": result.returncode == 0,
                 "command": " ".join(cmd),
@@ -305,11 +341,16 @@ def main() -> int:
         if payload.get("stdout"):
             print(payload["stdout"][:500])
         refs = payload.get("references") or []
+        if payload.get("parsed", {}).get("intent") == "search_papers":
+            print("\n📚 References (Authors / Year / Title / DOI / Explanation)")
         if refs:
-            print("\n📚 References (Title + DOI)")
             for i, ref in enumerate(refs, start=1):
-                print(f"{i}. {ref['title']}")
+                print(f"{i}. {ref['authors']} ({ref['year']})")
+                print(f"   Title: {ref['title']}")
                 print(f"   DOI: {ref['doi']}")
+                print(f"   Explanation: {ref['explanation']}")
+        elif payload.get("parsed", {}).get("intent") == "search_papers":
+            print("- No references found.")
         return 0
     print(f"실패: {payload.get('error', 'Unknown error')}")
     if payload.get("stderr"):
