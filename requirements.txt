@@ -35,6 +35,7 @@ pypdf>=3.17.0
 # Logging
 # ===================
 loguru>=0.7.0
+requests>=2.31.0
 
 # ===================
 # Async Support

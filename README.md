@@ -8,19 +8,21 @@
 
 ```
 SHawn-BIO/
-├── 01-Analysis/          # 핵심 분석 엔진 및 파이프라인
-│   ├── research_engine.py    # 메타 분석 엔진 (v3.5)
-│   ├── sbi_pipeline.py       # FAISS 벡터 검색 파이프라인
-│   ├── test_sbi_research.py  # 통합 테스트 스크립트
-│   └── verify_brain.py       # Brain 모듈 검증
+├── tools/                # 핵심 분석 엔진 및 CLI
+│   ├── research_engine.py      # 메타 분석 엔진
+│   ├── sbi_pipeline.py         # FAISS 벡터 검색 파이프라인
+│   ├── verify_brain.py         # Brain 모듈 검증
+│   ├── test_sbi_research.py    # 통합 테스트 스크립트
+│   ├── nli.py                  # 자연어 인터페이스
+│   ├── shawn_bio_search_cli.py # SHawn-WEB 브리지 CLI
+│   └── web_bio_search.py       # SHawn-WEB API 클라이언트
 ├── 99-System/            # SHawn-BOT 연동 레이어
 ├── analysis/             # 분석 결과 저장소
-├── assets/               # 시각화 차트 및 이미지
-├── concepts/             # 연구 개념 및 가설 메모
-├── papers/               # 논문 및 문헌 자료
-├── knowledge_base/       # FAISS 벡터 인덱스 (gitignore)
+├── references/           # 검색/증거 스키마 문서
+├── knowledge_base/       # FAISS 벡터 인덱스 (gitignore, runtime 생성)
 ├── requirements.txt      # Python 의존성
-└── GEMINI.md            # 시스템 프로토콜
+├── pyproject.toml        # 콘솔 엔트리포인트 정의
+└── GEMINI.md             # 시스템 프로토콜
 ```
 
 ## SBI (SHawn Bio-Intelligence)
@@ -55,10 +57,10 @@ export PYTHONPATH="/path/to/SHawn-BOT:$PYTHONPATH"
 
 ```bash
 # 1. 환경 검증
-uv run python 01-Analysis/verify_brain.py
+uv run python tools/verify_brain.py
 
 # 2. 통합 테스트 실행
-uv run python 01-Analysis/test_sbi_research.py
+uv run python tools/test_sbi_research.py
 ```
 
 ## Natural Language CLI (Cross-Platform)
@@ -98,6 +100,11 @@ shawn-bio-nli --skill-path "/custom/path/shawn-bio-search" "search query"
 ```bash
 export SHAWN_BIO_SKILL_PATH="/custom/path/shawn-bio-search"
 ```
+
+Note:
+- `shawn-bio-nli`는 자연어 라우터입니다.
+- 실제 paper/dataset 검색 엔진은 `shawn-bio-search/scripts`에 있으며 기본 경로는 `~/.openclaw/workspace/skills/shawn-bio-search` 입니다.
+- `--skill-path` 또는 `SHAWN_BIO_SKILL_PATH`로 엔진 경로를 지정할 수 있습니다.
 
 ## Governance
 
