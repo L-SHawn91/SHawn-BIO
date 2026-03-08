@@ -190,7 +190,7 @@ python3 scripts/build_review_list.py \
   "inflammatory signaling contributes to progesterone resistance" \
   "Homo sapiens" \
   "RNA-Seq" \
-  "/Users/soohyunglee/Downloads/endometrial_organoid_pipeline"
+  "./outputs/endometrial_organoid_pipeline"
 ```
 
 빠른 통합 모드:
@@ -202,7 +202,7 @@ python3 scripts/build_review_list.py \
   "inflammatory signaling contributes to progesterone resistance" \
   "Homo sapiens" \
   "RNA-Seq" \
-  "/Users/soohyunglee/Downloads/endometrial_organoid_fast" \
+  "./outputs/endometrial_organoid_fast" \
   --fast
 ```
 
@@ -215,7 +215,7 @@ python3 scripts/build_review_list.py \
   "inflammatory signaling contributes to progesterone resistance" \
   "Homo sapiens" \
   "RNA-Seq" \
-  "/Users/soohyunglee/Downloads/endometrial_organoid_fast_with_datasets" \
+  "./outputs/endometrial_organoid_fast_with_datasets" \
   --fast --with-datasets
 ```
 

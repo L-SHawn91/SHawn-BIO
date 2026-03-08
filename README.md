@@ -104,5 +104,9 @@ export SHAWN_BIO_SKILL_PATH="/custom/path/shawn-bio-search"
 - 모든 연구 결과는 **What-Why-How** 삼단논법 준수
 - 상세 운영 규정은 `GEMINI.md` 참조
 
+## License
+
+This project is licensed under the MIT License. See `LICENSE`.
+
 ---
 *Powered by SHawn-Bot AI-Intelligence Network (v3.6)*
