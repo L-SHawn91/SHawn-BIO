@@ -1,7 +1,20 @@
 """
 Web-based bio literature search adapter.
+
+⚠️ DEPRECATED: This module is deprecated in favor of shawn_bio_search.
+Use shawn_bio_search for direct multi-source literature search.
+
 Primary source: SHawn-WEB API (/api/papers/search-parallel).
 """
+
+import warnings
+
+warnings.warn(
+    "web_bio_search is deprecated. Use shawn_bio_search instead. "
+    "Install: pip install shawn-bio-search",
+    DeprecationWarning,
+    stacklevel=2
+)
 
 import os
 import re
@@ -9,6 +22,17 @@ from typing import Any, Dict, List, Optional, Tuple
 
 import requests
 from loguru import logger
+
+
+def search_with_shawn_bio_search(query: str, max_results: int = 10) -> List[Dict[str, Any]]:
+    """Redirect to shawn_bio_search if available."""
+    try:
+        from shawn_bio_search import search_papers
+        result = search_papers(query=query, max_results=max_results)
+        return result.papers if hasattr(result, 'papers') else result.get('papers', [])
+    except ImportError:
+        logger.warning("shawn_bio_search not installed. Falling back to web search.")
+        return []
 
 
 class BioWebSearchClient:

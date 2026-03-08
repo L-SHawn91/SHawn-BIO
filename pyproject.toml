@@ -11,6 +11,18 @@ requires-python = ">=3.9"
 dependencies = [
     "requests>=2.25.0",
     "urllib3>=1.26.0",
+    # TODO: Uncomment after shawn-bio-search is published
+    # "shawn-bio-search>=0.1.0",
+]
+
+[project.optional-dependencies]
+search = [
+    # Install shawn-bio-search from GitHub until PyPI release
+    "shawn-bio-search @ git+https://github.com/L-SHawn91/shawn-bio-search.git@main",
+]
+dev = [
+    "pytest>=7.0.0",
+    "black>=22.0.0",
 ]
 
 [project.scripts]
