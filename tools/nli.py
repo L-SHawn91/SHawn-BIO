@@ -31,6 +31,38 @@ def _low_info_claim(claim: str) -> bool:
     return x in {"검증", "검증해", "확인", "확인해", "verify", "check", "prove"}
 
 
+def _load_json_if_exists(path: str) -> Dict | None:
+    try:
+        p = Path(path)
+        if not p.exists():
+            return None
+        with p.open("r", encoding="utf-8") as f:
+            data = json.load(f)
+        if isinstance(data, dict):
+            return data
+    except Exception:
+        return None
+    return None
+
+
+def _paper_refs_with_title_doi(payload: Dict | None) -> List[Dict[str, str]]:
+    if not payload:
+        return []
+    papers = payload.get("papers")
+    if not isinstance(papers, list):
+        return []
+    refs: List[Dict[str, str]] = []
+    for p in papers:
+        if not isinstance(p, dict):
+            continue
+        title = str(p.get("title") or "").strip()
+        if not title:
+            continue
+        doi = str(p.get("doi") or "").strip() or "N/A"
+        refs.append({"title": title, "doi": doi})
+    return refs
+
+
 class BioSearchNLI:
     """Natural Language Interface for bio search."""
 
@@ -212,12 +244,17 @@ class BioSearchNLI:
             }
             timeout = timeout_map.get(parsed["intent"], 60)
             result = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+            references: List[Dict[str, str]] = []
+            if parsed["intent"] == "search_papers":
+                out_payload = _load_json_if_exists("/tmp/shawn_bio_papers.json")
+                references = _paper_refs_with_title_doi(out_payload)
             return {
                 "success": result.returncode == 0,
                 "command": " ".join(cmd),
                 "parsed": parsed,
                 "stdout": result.stdout,
                 "stderr": result.stderr,
+                "references": references,
             }
         except Exception as e:
             return {"success": False, "error": str(e), "parsed": parsed}
@@ -267,6 +304,12 @@ def main() -> int:
         print("성공!")
         if payload.get("stdout"):
             print(payload["stdout"][:500])
+        refs = payload.get("references") or []
+        if refs:
+            print("\n📚 References (Title + DOI)")
+            for i, ref in enumerate(refs, start=1):
+                print(f"{i}. {ref['title']}")
+                print(f"   DOI: {ref['doi']}")
         return 0
     print(f"실패: {payload.get('error', 'Unknown error')}")
     if payload.get("stderr"):
