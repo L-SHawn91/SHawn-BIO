@@ -1,0 +1,31 @@
+{
+  "project": "SHawn-BIO (Research Platform / Bridge Layer)",
+  "path": "/Users/soohyunglee/GitHub/SHawn-BIO",
+  "role": "웹/브레인 기반 연구 플랫폼 및 검색 브릿지",
+  "updated": "2026-03-09",
+  "scope": [
+    "SHawn-WEB 검색 브릿지",
+    "저자 동명이인(author) 모드 지원",
+    "ResearchEngine/지식 기반 분석",
+    "프로필/knowledge 확장 레이어"
+  ],
+  "components": {
+    "tools/web_bio_search.py": "SHawn-WEB API 호출(Adapter) 및 검색 정규화. 실패 시 graceful empty 반환.",
+    "tools/shawn_bio_search_cli.py": "브릿지 CLI. broad/author 모드 지원, --as-bundle로 OpenClaw 호환 bundle 출력 추가",
+    "tools/research_engine.py": "문헌 컨텍스트 통합/메타 분석 엔진(브레인 연동 포함)",
+    "tools/sbi_pipeline.py": "지식 DB/로컬 인덱스 유틸리티",
+    "tools/verify_brain.py": "연동 상태 점검",
+    "bio_cartridge.py": "Bio domain cartridge 진입 인터페이스"
+  },
+  "interfaces_with_openclaw": [
+    "run_shawn_bio_bridge.sh에서 tools/shawn_bio_search_cli.py 호출",
+    "upstream 패키지의 검색 결과 외에도 Web/author 모드 결과를 보정 및 보강",
+    "SHawn-BIO 연동은 실행 가능 유무에 따라 로컬 fallback 동작"
+  ],
+  "optimizations_applied_2026_03_09": [
+    "shawn_bio_search_cli에 --as-bundle 모드 추가",
+    "브릿지 출력을 OpenClaw downstream 스키마(논문 필드 정규화/메타 포함)로 변환 가능하게 정비",
+    "실패/빈 응답 시에도 파싱 가능한 구조 유지"
+  ],
+  "updated_by": "OpenClaw integration pass"
+}
