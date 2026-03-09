@@ -112,7 +112,7 @@ uv run python tools/test_sbi_research.py
   "Pregnancy endpoints should be secondary in early-phase uterine fibrosis trials." \
   "./outputs/adeno_v2" \
   --zotero-root "/path/to/Zotero/papers" \
-  --fast --with-kaggle --with-cellcog
+  --fast --with-kaggle --with-cellcog --with-unpaywall --with-orcid
 ```
 
 산출물:
@@ -122,6 +122,7 @@ uv run python tools/test_sbi_research.py
 - `<prefix>_citations.{md,csv,bib}`
 - `<prefix>_missing_in_zotero.md`
 - `<prefix>_datasets_plus.md`
+- `<prefix>_bundle_enriched.json` (optional ORCID/Unpaywall enrichment: oa_status, oa_pdf_url, orcid_matches)
 
 ## First-time installation workflow
 
