@@ -56,6 +56,7 @@ SHawn-BIO/
 ├── 99-System/            # SHawn-BOT 연동 레이어
 ├── analysis/             # 분석 결과 저장소
 ├── references/           # 검색/증거 스키마 문서
+├── scripts/              # 검색/인용/근거/데이터셋 자동화 파이프라인
 ├── knowledge_base/       # FAISS 벡터 인덱스 (gitignore, runtime 생성)
 ├── requirements.txt      # Python 의존성
 ├── pyproject.toml        # 콘솔 엔트리포인트 정의
@@ -98,6 +99,54 @@ uv run python tools/verify_brain.py
 
 # 2. 통합 테스트 실행
 uv run python tools/test_sbi_research.py
+```
+
+## Paper Writing Mode (v2)
+
+논문작성용 근거 패키지(논문/인용/반증/Zotero 누락체크/데이터셋 보강)를 1회 실행으로 생성합니다.
+
+```bash
+./scripts/run_paper_writing_mode_v2.sh \
+  "adenomyosis ivf meta-analysis" \
+  "Adenomyosis is associated with poorer IVF outcomes." \
+  "Pregnancy endpoints should be secondary in early-phase uterine fibrosis trials." \
+  "./outputs/adeno_v2" \
+  --zotero-root "/path/to/Zotero/papers" \
+  --fast --with-kaggle --with-cellcog
+```
+
+산출물:
+- `<prefix>_bundle.json`
+- `<prefix>_review.md`
+- `<prefix>_evidence.md` (support/contradict/uncertain + gaps)
+- `<prefix>_citations.{md,csv,bib}`
+- `<prefix>_missing_in_zotero.md`
+- `<prefix>_datasets_plus.md`
+
+## First-time installation workflow
+
+```bash
+git clone https://github.com/L-SHawn91/SHawn-BIO.git
+cd SHawn-BIO
+uv venv
+uv pip install -r requirements.txt
+cp .env.example .env
+# .env에서 최소 ZOTERO_ROOT 설정
+set -a && source .env && set +a
+
+# (옵션) Kaggle 연동
+mkdir -p ~/.kaggle
+printf '{"username":"%s","key":"%s"}\n' "$KAGGLE_USERNAME" "$KAGGLE_KEY" > ~/.kaggle/kaggle.json
+chmod 600 ~/.kaggle/kaggle.json
+
+# 스모크 테스트
+./scripts/run_paper_writing_mode_v2.sh \
+  "adenomyosis ivf meta-analysis" \
+  "Adenomyosis is associated with poorer IVF outcomes." \
+  "Pregnancy endpoints should be secondary in early-phase uterine fibrosis trials." \
+  "./outputs/smoke" \
+  --zotero-root "$ZOTERO_ROOT" \
+  --fast --with-kaggle
 ```
 
 ## Natural Language CLI (Cross-Platform)
