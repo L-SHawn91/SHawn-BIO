@@ -1,0 +1,12 @@
+{
+  "project_slug": "shawn-bio",
+  "display_name": "SHawn-BIO",
+  "status": "active-repo",
+  "working_folder": "/home/mdge/github/SHawn-BIO",
+  "repo_name": "SHawn-BIO",
+  "main_session": "proj-shawn-bio",
+  "source_of_truth": "filesystem-first",
+  "write_policy": "limited-writeback",
+  "tags": ["bio", "shawn"],
+  "last_reviewed_at": "2026-03-15"
+}
