@@ -19,7 +19,7 @@ def _default_skill_path() -> Path:
     env_path = os.getenv("SHAWN_BIO_SKILL_PATH")
     if env_path:
         return Path(env_path).expanduser()
-    return Path.home() / ".openclaw/workspace/skills/shawn-bio-search"
+    return Path.home() / "github/shawn-bio-search"
 
 
 def _low_info_claim(claim: str) -> bool:

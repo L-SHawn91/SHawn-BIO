@@ -176,7 +176,7 @@ shawn-bio-nli --dry-run --json "progesterone resistance 주장 검증해"
 
 ### 3) Skill Path Override (Optional)
 
-기본 스크립트 경로는 `~/github/shawn-bio-search-public` 입니다.
+기본 스크립트 경로는 `~/github/shawn-bio-search` 입니다.
 
 ```bash
 shawn-bio-nli --skill-path "/custom/path/shawn-bio-search" "search query"
@@ -190,7 +190,7 @@ export SHAWN_BIO_SKILL_PATH="/custom/path/shawn-bio-search"
 
 Note:
 - `shawn-bio-nli`는 자연어 라우터입니다.
-- 실제 paper/dataset 검색 엔진은 `shawn-bio-search-public/scripts`에 있으며 기본 경로는 `~/github/shawn-bio-search-public` 입니다.
+- 실제 paper/dataset 검색 엔진은 `shawn-bio-search/scripts`에 있으며 기본 경로는 `~/github/shawn-bio-search` 입니다.
 - `--skill-path` 또는 `SHAWN_BIO_SKILL_PATH`로 엔진 경로를 지정할 수 있습니다.
 
 ## Governance
