@@ -8,6 +8,8 @@
 
 ### Shawn-Bio-Search: Multi-Source Literature Search
 
+> Note: `shawn-bio-search` is the canonical search engine repo/path, and `SHawn-BIO` acts as the higher-level integration layer that uses it.
+
 9개 글로벌 학술 DB 통합 검색 with 근거 기반 스코어링:
 
 | Source | Type | API Key |

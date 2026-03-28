@@ -8,9 +8,11 @@
 - main_session: proj-shawn-bio
 - source_of_truth: filesystem-first
 - write_policy: limited-writeback
+- role: integration-layer
+- related_search_repo: /home/mdge/github/shawn-bio-search
 
 ## Goal
-Operate and evolve the SHawn bio tooling repository under the shared github repo container.
+Operate and evolve the SHawn-BIO integration repository while treating the canonical search engine as the separate `shawn-bio-search` repo.
 
 ## Core rules
 - Files/folders are the source of truth.
